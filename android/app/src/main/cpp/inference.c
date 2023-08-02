@@ -612,7 +612,7 @@ void stop() {
     LOGI("stop reference");
 }
 
-jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
 
     if ((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_6) != JNI_OK)
@@ -626,6 +626,17 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    if ((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_6)) {
+        return;
+    }
+    (*env)->DeleteGlobalRef(env, g_InferenceJniBridgeJavaClass);
+    (*env)->DeleteGlobalRef(env, g_onNewTokenMethodId);
+    return;
+}
+
+
 JNIEXPORT void JNICALL
 Java_com_celikin_llama2_wrapper_InferenceRunner_run(JNIEnv *env, jobject thiz, jstring checkpoint,
                                                     jstring tokenizer, jfloat temperature,
@@ -635,9 +646,15 @@ Java_com_celikin_llama2_wrapper_InferenceRunner_run(JNIEnv *env, jobject thiz, j
     const char *tokenizer_path = (*env)->GetStringUTFChars(env, tokenizer, 0);
     const char *_prompt = (*env)->GetStringUTFChars(env, prompt, 0);
 
+    if (ompthreads >= 0 && ompthreads < 8) {
+        omp_set_num_threads(ompthreads);
+    } else {
+        LOGE("incorrect number of threads for openMP! expect: 1..8\n");
+    }
+
     LOGI("inference loaded checkpoint path: %s tokenizer path: %s temperature %f, steps %d prompt %s",
          checkpoint_path, tokenizer_path, temperature, steps, _prompt);
-    omp_set_num_threads(ompthreads);
+
     run_inference(env, thiz, checkpoint_path, tokenizer_path, temperature, steps, _prompt);
 
     (*env)->ReleaseStringUTFChars(env, checkpoint, checkpoint_path);

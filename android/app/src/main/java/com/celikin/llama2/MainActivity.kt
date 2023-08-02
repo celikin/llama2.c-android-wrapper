@@ -30,8 +30,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            val assetsFolder = copyAssets(arrayOf("stories15M.bin", "tokenizer.bin"))
-            initInference(assetsFolder)
+            val checkpoint = "stories15M.bin"
+            val tokenizer = "tokenizer.bin"
+            val assetsFolder = copyAssets(arrayOf(checkpoint, tokenizer))
+            initInference(assetsFolder, checkpoint, tokenizer)
         }
 
     }
@@ -40,9 +42,9 @@ class MainActivity : AppCompatActivity() {
         binding.sampleText.text = "${binding.sampleText.text}$token"
     }
 
-    private fun initInference(assetsFolder: String) {
-        inferenceRunnerManager = InferenceRunnerManager()
-            .apply { init(callback, assetsFolder) }
+    private fun initInference(assetsFolder: String, checkpoint: String, tokenizer: String) {
+        inferenceRunnerManager =
+            InferenceRunnerManager(callback, assetsFolder, checkpoint, tokenizer)
     }
 
 }
