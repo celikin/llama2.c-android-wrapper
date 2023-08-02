@@ -26,7 +26,7 @@ project("inference")
 
 set(OPTIMIZATION_FLAGS
         -Ofast
-        -fopenmp
+        -fopenmp-simd
         -funroll-all-loops
         -Wall
         -Wextra
