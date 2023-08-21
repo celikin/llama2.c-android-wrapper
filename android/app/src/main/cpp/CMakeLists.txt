@@ -24,26 +24,23 @@ project("inference")
 # for GameActivity/NativeActivity derived applications, the same library name must be
 # used in the AndroidManifest.xml file.
 
-set(OPTIMIZATION_FLAGS
-        -Ofast
-        -fopenmp-simd
-        -funroll-all-loops
-        -Wall
-        -Wextra
-        )
+#for inference-gpu uncomment this block
 
-add_library(${CMAKE_PROJECT_NAME} SHARED
-        # List C/C++ source files with relative paths to this CMakeLists.txt.
-        inference.c
-        )
+#set(OPTIMIZATION_FLAGS -Ofast -funroll-all-loops -Wall -Wextra)
+#add_library(${CMAKE_PROJECT_NAME} SHARED inference-gpu.c)
+#find_library(GLESv2-lib GLESv2 )
+#find_library(GLESv3-lib GLESv3 )
+#find_library(EGL-lib EGL )
+#target_link_libraries(${CMAKE_PROJECT_NAME} android log -lm ${GLESv2-lib} ${GLESv3-lib} ${EGL-lib})
 
-# Specifies libraries CMake should link to your target library. You
-# can link libraries from various origins, such as libraries defined in this
-# build script, prebuilt third-party libraries, or Android system libraries.
-target_link_libraries(${CMAKE_PROJECT_NAME}
-        # List libraries link to the target library
-        android
-        log
-        -fopenmp -static-openmp)
+#===================================
+
+#for inference-gpu comment this block
+
+set(OPTIMIZATION_FLAGS -Ofast -fopenmp-simd -funroll-all-loops -Wall -Wextra)
+add_library(${CMAKE_PROJECT_NAME} SHARED inference.c)
+target_link_libraries(${CMAKE_PROJECT_NAME} android log -lm -fopenmp -static-openmp)
+
+#===================================
 
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:${OPTIMIZATION_FLAGS}>)
