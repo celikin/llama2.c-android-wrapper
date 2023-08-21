@@ -13,6 +13,7 @@ object InferenceRunner {
         tokenizer: String,
         temperature: Float,
         steps: Int,
+        topp: Float,
         prompt: String,
         ompthreads: Int
     )

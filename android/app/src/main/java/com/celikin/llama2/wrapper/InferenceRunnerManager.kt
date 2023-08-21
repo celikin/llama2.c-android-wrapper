@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
 
 class InferenceRunnerManager(
     callback: InferenceRunner.InferenceCallback,
@@ -24,6 +23,7 @@ class InferenceRunnerManager(
         prompt: String = "",
         temperature: Float = DEFAULT_TEMPERATURE,
         steps: Int = DEFAULT_STEPS,
+        topp: Float = DEFAULT_TOPP
     ) {
         applicationScope.launch {
             InferenceRunner.run(
@@ -31,6 +31,7 @@ class InferenceRunnerManager(
                 tokenizer = "$folderPath/$tokenizerFileName",
                 temperature = temperature,
                 steps = steps,
+                topp = topp,
                 prompt = prompt,
                 ompthreads = ompThreads
             )
@@ -39,7 +40,8 @@ class InferenceRunnerManager(
 
     companion object {
         private const val DEFAULT_OMP_THREADS = 4
-        private const val DEFAULT_TEMPERATURE = 0.9f
+        private const val DEFAULT_TEMPERATURE = 1.0f
         private const val DEFAULT_STEPS = 256
+        private const val DEFAULT_TOPP = 0.9f
     }
 }
